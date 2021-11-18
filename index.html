@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <canvas id="canvas" style="width: 300px; height: 410px"></canvas>
+  </body>
+  <script type="module">
+    // const  canvas = document.getElementById('canvas');
+    import CanvasPoster from "./lib/index.ts";
+    const poster = new CanvasPoster(canvas, {
+      width: 600,
+      height: 820,
+      type: "2d",
+    });
+    poster.draw([
+      {
+        type: "image",
+        image: "./example/image/baina_wrap.png",
+        x: 0,
+        y: 0,
+        width: 600,
+        height: 820,
+      },
+      {
+        type: "image",
+        image: "https://static.seapard.com/zdm/2021/07/08/162572445063712.jpg",
+        x: 75,
+        y: 160,
+        width: 450,
+        height: 450,
+        borderRadius: 16,
+      },
+      {
+        type: "text",
+        text: "我是文字",
+        x: 185,
+        y: 203,
+        color: "#000",
+      },
+      {
+        type: "image",
+        image: "./example/image/dialog_bottom.png",
+        x: 0,
+        y: 560,
+        width: 600,
+        height: 260,
+      },
+      {
+        type: "text",
+        text: "我是文字",
+        x: 185,
+        y: 600,
+        color: "#000",
+      },
+    ]);
+    // 测试是否获取到
+    // console.log('canvas', poster.getCanvas());
+    // console.log('ctx', poster.getCtx());
+  </script>
+</html>
+<!-- 
+ -->

@@ -1,0 +1,22 @@
+{
+  "name": "CanvasPoster",
+  "version": "1.0.0",
+  "main": "./dist/create-poster.umd.js",
+  "module": "./dist/create-poster.es.js",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/create-poster.es.js",
+      "require": "./dist/create-poster.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite --mode dev",
+    "build": "vite build --mode prod",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7",
+    "vite": "^2.6.14"
+  }
+}
