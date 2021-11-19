@@ -1,5 +1,5 @@
 {
-  "name": "canvas-poster-hou",
+  "name": "@moonhou/canvas-poster",
   "version": "1.0.1",
   "main": "./dist/create-poster.umd.js",
   "module": "./dist/create-poster.es.js",
