@@ -4,3 +4,5 @@ example/
 yarn-error.log*
 yarn.lock
 package-lock.json
+.git
+dist.zip

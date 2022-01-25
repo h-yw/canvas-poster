@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { qrcode } from 'vite-plugin-qrcode';
 import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,9 @@ export default defineConfig({
     },
     extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json"],
   },
+  plugins:[
+    qrcode()
+  ],
   build: {
     outDir: path.resolve(__dirname, "dist"),
     assetsDir: path.resolve(__dirname, "src/public"),
@@ -25,9 +29,9 @@ export default defineConfig({
       fileName: (format) => `create-poster.${format}.js`,
     },
     rollupOptions: {
-      // input: {
-      //   main: path.resolve(__dirname, "index.html"),
-      // },
+      /* input: {
+        main: path.resolve(__dirname, "index.html"),
+      }, */
       external: ["react", "react-dom", "vue",'index.html'],
     },
   },

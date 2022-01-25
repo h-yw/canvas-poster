@@ -5,15 +5,20 @@
  * @author Mr.Hou
  * @time 2021/11/18
  */
-import { PosterConfig, TextConfig, ImageConfig } from "./type";
+import { PosterConfig, TextConfig, ImageConfig, DrawProps } from "./type";
+type Selector = string
 class CanvasPoster {
   private _canvas: HTMLCanvasElement;
   private _ctx: CanvasRenderingContext2D;
   private _config: PosterConfig;
-  constructor(canvas: HTMLCanvasElement, config: PosterConfig | undefined) {
+  public _ratio = 1;
+  private _openEvent =false
+  constructor(canvas: HTMLCanvasElement, config?: PosterConfig) {
     this._canvas = canvas;
     this._config = config;
-    this._ctx = this._canvas.getContext("2d");
+    this._ctx = this._canvas.getContext("2d", { alpha: false });
+    this._ratio =config.ratio
+    config.onClick&&this.listener(config.onClick)
     // 设置canvas
     this._setCanvas();
   }
@@ -22,9 +27,11 @@ class CanvasPoster {
    * @return
    */
   private _setCanvas(): void {
+    let devicePixelRatio = window.devicePixelRatio || 1;
     if (this._config) {
-      this._canvas.width = this._config.width;
-      this._canvas.height = this._config.height;
+      this._canvas.width = this._config.width * devicePixelRatio;
+      this._canvas.height = this._config.height * devicePixelRatio*this._ratio;
+      this._ctx.scale(devicePixelRatio, devicePixelRatio);
     }
     this._ctx.font = "24px sans-serif";
     this._ctx.fillStyle = "#000";
@@ -37,39 +44,39 @@ class CanvasPoster {
    * @param {Array[ImageConfig|TextConfig]} data
    * @returns
    */
-  public async draw(data: Array<any>): Promise<void> {
+  public async draw(data: Array<DrawProps>) {
     let len = data.length;
     for (let i = 0; i < len; i++) {
       if (data[i].type === "text") {
         this.drawText(data[i]);
-        console.log(i);
-
         // continue
       }
       if (data[i].type === "image") {
-        if (data[i].image instanceof Image) {
-          this.drawImage(data[i]);
-          console.log(i);
+        // if (data[i].image instanceof Image) {
+        //   this.drawImage(data[i]);
+        //   console.log(i);
 
-          // continue
-        }
-        if (typeof data[i].image === "string") {
-          let img = await this.createImage(data[i].image);
-          data[i].image = img;
-          // console.log(res);
+        //   // continue
+        // }
+        if (typeof data[i].type === "string") {
+          let img = await this.createImage(data[i].source as string);
+          // console.log(img);
+          data[i].source = img as CanvasImageSource;
           this.drawImage(data[i]);
-          console.log(i);
         }
       }
+      console.log(data[i]);
+      
     }
   }
+
 
   /**
    * @description 绘制文字
    * @param {TextConfig} params
    * @returns
    */
-  public async drawText(params: TextConfig): Promise<number> {
+  public async drawText(params: DrawProps): Promise<number> {
     return new Promise((resolve, reject) => {
       if (params.font) {
         this._ctx.font = params.font;
@@ -78,10 +85,12 @@ class CanvasPoster {
         this._ctx.fillStyle = params.color;
       }
       if (params.textAlign) {
+        console.log(params.textAlign);
+        
         this._ctx.textAlign = params.textAlign;
       }
       if (!params.maxWidth) {
-        this._ctx.fillText(params.text, params.x, params.y);
+        this._ctx.fillText(params.source as string, params.x, params.y);
         return;
       }
       let MAX_WIDTH = params.maxWidth || 200;
@@ -89,7 +98,7 @@ class CanvasPoster {
       let lineHeight = params.lineHeight || 24;
       let startX = params.x || 0;
       let startY = params.y || 0;
-      let allAtr = params.text.split("");
+      let allAtr = (params.source as string).split("");
       let rowArr = []; // 拆分出来的每一行
       let rowStrArr = []; // 每一行的文字数组
       for (let i = 0; i < allAtr.length; i++) {
@@ -124,7 +133,7 @@ class CanvasPoster {
    * @param {ImageConfig} params
    * @returns
    */
-  public async drawImage(params: ImageConfig): Promise<void> {
+  public async drawImage(params: DrawProps): Promise<void> {
     return new Promise((resolve, reject) => {
       if (params.borderRadius !== undefined) {
         this.creatBorderRect(
@@ -144,16 +153,18 @@ class CanvasPoster {
         params.dWidth == undefined ||
         params.dHeight == undefined
       ) {
+        // console.log(params);
+        
         this._ctx.drawImage(
-          params.image,
-          params.x,
-          params.y,
-          params.width,
-          params.height,
+          params.source as CanvasImageSource,
+          params.x*this._ratio,
+          params.y*this._ratio,
+          params.width*this._ratio,
+          params.height*this._ratio,
         );
       } else {
         this._ctx.drawImage(
-          params.image,
+          params.source as CanvasImageSource,
           params.dx,
           params.dy,
           params.dWidth,
@@ -174,6 +185,8 @@ class CanvasPoster {
    * @returns {Promise<HTMLImageElement|unknown>}
    */
   public createImage(src: string): Promise<HTMLImageElement | unknown> {
+    console.log(src);
+
     if (!Image) {
       console.log("不支持new Image(),传入CanvasImageSource");
       return;
@@ -267,6 +280,18 @@ class CanvasPoster {
   public getCtx(): RenderingContext {
     return this._ctx;
   }
+  public setRatio(resW: number, deviceW: number) {
+      this._ratio = deviceW / resW;
+  }
+  public listener(callback: Function) {
+    this._canvas.addEventListener("click", (event)=>{
+      let position = {
+        x: event.offsetX,
+        y: event.offsetY
+      }
+      event['$position'] = position;
+      callback(event);
+    });
+  }
 }
-
 export default CanvasPoster;

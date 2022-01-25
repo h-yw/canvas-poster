@@ -14,7 +14,8 @@
       "types": ["vite/client"],
       "declaration": true,
       "declarationDir": "dist",
-      "typeRoots": ["./types","./node_modules/@types"]
+      "baseUrl": "/",
+      "typeRoots": ["/lib","./types","./node_modules/@types"]
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
   }
