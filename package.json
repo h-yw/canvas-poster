@@ -1,6 +1,6 @@
 {
   "name": "@moonhou/canvas-poster",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "main": "./dist/create-poster.umd.js",
   "module": "./dist/create-poster.es.js",
   "license": "MIT",

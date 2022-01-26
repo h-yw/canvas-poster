@@ -4,6 +4,7 @@
 
 CanvasPoster使用canvas原生接口快速绘制简单canvas,导出base64资源。
 
+`Tips:` betas 版本可能会有bug，请谨慎使用。
 ## 项目安装
 
 ```bash
@@ -29,56 +30,47 @@ CanvasPoster使用canvas原生接口快速绘制简单canvas,导出base64资源�
 ```
 
 ## 使用示例
+
 ```js
-import CanvasPoster from 'canvas-poster';
-    const poster = new CanvasPoster(canvas, {
-      width: 600, 
-      height: 820,
-      ratio: 1, // window.innerWidth / 画稿宽度
-      type: "2d",
-});
-poster.draw([
+  import CanvasPoster from "./lib/index.ts";
+  const poster = new CanvasPoster(canvas, {
+    width: window.innerWidth,
+    height: 3615,
+    type: "2d",
+    ratio:375 / 750, // 缩放比例：canvas宽度/画稿宽度
+    // 可选参数：点击区域
+    target: {
+      share: {
+        x: 644,
+        y: 58,
+        width: 96,
+        height: 96,
+      }
+    },
+    // 可选参数：点击区域的回调,
+    onClick: (event) => {
+      // 点击位置
+      console.log(event.$position);
+      // 击中目标
+      console.log(event.$target);
+    }
+  });
+  poster.draw([
     {
-        type: "image",
-        image: "./example/image/baina_wrap.png",
-        x: 0,
-        y: 0,
-        width: 600,
-        height: 820,
+      type: 'image',
+      source: './example/image/bg.png',
+      x: 0,
+      y: 0,
+      width: 750,
+      height: 3615,
     },
     {
-        type: "image",
-        image: "https://static.seapard.com/zdm/2021/07/08/162572445063712.jpg",
-        x: 75,
-        y: 160,
-        width: 450,
-        height: 450,
-        borderRadius: 16, // 圆角
-    },
-    {
-        type: "text",
-        text: "我是文字",
-        x: 185, // 文字起始x坐标
-        y: 203, // 文字起始y坐标
-        color: "#000", // 字体颜色
-        linHeight: 40, // 行高
-        font:'24px sans-serif', //字体
-        totalLine: 1, //显示行数
-    },
-    {
-        type: "image",
-        image: "./example/image/dialog_bottom.png",
-        x: 0,
-        y: 560,
-        width: 600,
-        height: 260,
-    },
-    {
-        type: "text",
-        text: "我是文字",
-        x: 185,
-        y: 600,
-        color: "#000",
-    },
-]);
+      type: 'text',
+      source: '哈哈哈哈哈哈哈哈哈哈哈',
+      x: Math.floor(320 / 2),
+      y: 12,
+      maxWidth: 375,
+      color: '#f0f0ff'
+    }
+  ]);
 ```

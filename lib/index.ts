@@ -94,6 +94,7 @@ class CanvasPoster {
       }
       event['$position'] = position;
       event['$target'] = $target;
+      
       callback(event);
     });
   }
@@ -276,7 +277,7 @@ class CanvasPoster {
     r: number,
     color?: string | CanvasGradient | CanvasPattern,
   ) {
-    [x, y, w, h, r] = [x * this._ratio, y * this._ratio, w * this._ratio, h * this._ratio, r * this._ratio];
+    // [x, y, w, h, r] = [x * this._ratio, y * this._ratio, w * this._ratio, h * this._ratio, r * this._ratio];
     this._ctx.beginPath();
     // 左上角
     this._ctx.arc(x + r, y + r, r, Math.PI, 1.5 * Math.PI);

@@ -28,10 +28,10 @@
   // const  canvas = document.getElementById('canvas');
   import CanvasPoster from "./lib/index.ts";
   const poster = new CanvasPoster(canvas, {
-    width: window.innerWidth,
+    width: 375, //canvas宽度
     height: 3615,
     type: "2d",
-    ratio: window.innerWidth / 750,
+    ratio:375 / 750, // 缩放比例：canvas宽度/画稿宽度
     target: {
       share: {
         x: 644,
@@ -55,14 +55,16 @@
       y: 0,
       width: 750,
       height: 3615,
+      borderRadius:0,
     },
     {
       type: 'text',
       source: '哈哈哈哈哈哈哈哈哈哈哈',
-      x: Math.floor(320 / 2),
-      y: 12,
+      x: Math.floor(375 / 2),
+      y: 15, //距离加上文字高度的一半
       maxWidth: 375,
-      color: '#f0f0ff'
+      color: '#f0f0ff',
+      font:'bold 30px Arial',
     }
   ]);
     // 测试是否获取到
