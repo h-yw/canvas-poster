@@ -34,6 +34,7 @@ import CanvasPoster from 'canvas-poster';
     const poster = new CanvasPoster(canvas, {
       width: 600, 
       height: 820,
+      ratio: 1, // window.innerWidth / 画稿宽度
       type: "2d",
 });
 poster.draw([

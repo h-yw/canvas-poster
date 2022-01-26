@@ -46,7 +46,7 @@ export interface TargetType{
 export type SourceType = 'image' | 'text';
 export type DrawProps= {
     type: SourceType;
-    source: CanvasImageSource | string;
+    source: HTMLImageElement | string;
     x: number;
     y: number;
     width: number;

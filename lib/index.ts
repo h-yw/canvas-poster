@@ -30,8 +30,8 @@ class CanvasPoster {
   private _setCanvas(): void {
     let devicePixelRatio = window.devicePixelRatio || 1;
     if (this._config) {
-      this._canvas.width = this._config.width * devicePixelRatio;
-      this._canvas.height = this._config.height * devicePixelRatio * this._ratio;
+      this._canvas.width = Math.floor(this._config.width * devicePixelRatio);
+      this._canvas.height = Math.floor(this._config.height * devicePixelRatio * this._ratio);
       this._ctx.scale(devicePixelRatio, devicePixelRatio);
     }
     this._ctx.font = "24px sans-serif";
@@ -50,7 +50,7 @@ class CanvasPoster {
     for (let i in targets) {
       let target = {
         x: targets[i].x * this._ratio,
-        y: targets[i].y * this._ratio, 
+        y: targets[i].y * this._ratio,
         width: targets[i].width * this._ratio, // 宽度宽度
         height: targets[i].height * this._ratio, // 目标区域高
         left: (targets[i].x + targets[i].width) * this._ratio, // 右边距上距离
@@ -118,7 +118,7 @@ class CanvasPoster {
         if (typeof data[i].type === "string") {
           let img = await this.createImage(data[i].source as string);
           // console.log(img);
-          data[i].source = img as CanvasImageSource;
+          data[i].source = img as HTMLImageElement;
           this.drawImage(data[i]);
         }
       }
@@ -148,11 +148,11 @@ class CanvasPoster {
         this._ctx.fillText(params.source as string, params.x, params.y);
         return;
       }
-      let MAX_WIDTH = params.maxWidth || 200;
+      let MAX_WIDTH = (params.maxWidth || 200);
       let totalLine = params.totalLine || 1;
       let lineHeight = params.lineHeight || 24;
-      let startX = params.x || 0;
-      let startY = params.y || 0;
+      let startX = (params.x || 0) ;
+      let startY = (params.y || 0) ;
       let allAtr = (params.source as string).split("");
       let rowArr = []; // 拆分出来的每一行
       let rowStrArr = []; // 每一行的文字数组
@@ -192,11 +192,11 @@ class CanvasPoster {
     return new Promise(() => {
       if (params.borderRadius !== undefined) {
         this.creatBorderRect(
-          params.x,
-          params.y,
-          params.width,
-          params.height,
-          params.borderRadius,
+          Math.floor(params.x * this._ratio),
+          Math.floor(params.y * this._ratio),
+          Math.floor((params.source as HTMLImageElement).width * this._ratio),
+          Math.floor((params.source as HTMLImageElement).height * this._ratio),
+          Math.floor(params.borderRadius * this._ratio),
         );
         // this.restore()
       }
@@ -211,23 +211,23 @@ class CanvasPoster {
         // console.log(params);
 
         this._ctx.drawImage(
-          params.source as CanvasImageSource,
-          params.x * this._ratio,
-          params.y * this._ratio,
-          params.width * this._ratio,
-          params.height * this._ratio,
+          params.source as HTMLImageElement,
+          Math.floor(params.x * this._ratio),
+          Math.floor(params.y * this._ratio),
+          Math.floor((params.source as HTMLImageElement).width * this._ratio),
+          Math.floor((params.source as HTMLImageElement).height * this._ratio),
         );
       } else {
         this._ctx.drawImage(
-          params.source as CanvasImageSource,
-          params.dx,
-          params.dy,
-          params.dWidth,
-          params.dHeight,
-          params.x,
-          params.y,
-          params.width,
-          params.height,
+          params.source as HTMLImageElement,
+          params.dx * this._ratio,
+          params.dy * this._ratio,
+          params.dWidth * this._ratio,
+          params.dHeight * this._ratio,
+          params.x * this._ratio,
+          params.y * this._ratio,
+          (params.source as HTMLImageElement).width * this._ratio,
+          (params.source as HTMLImageElement).height * this._ratio,
         );
       }
       this.restore();
@@ -241,7 +241,6 @@ class CanvasPoster {
    */
   public createImage(src: string): Promise<HTMLImageElement | unknown> {
     console.log(src);
-
     if (!Image) {
       console.log("不支持new Image(),传入CanvasImageSource");
       return;
@@ -277,6 +276,7 @@ class CanvasPoster {
     r: number,
     color?: string | CanvasGradient | CanvasPattern,
   ) {
+    [x, y, w, h, r] = [x * this._ratio, y * this._ratio, w * this._ratio, h * this._ratio, r * this._ratio];
     this._ctx.beginPath();
     // 左上角
     this._ctx.arc(x + r, y + r, r, Math.PI, 1.5 * Math.PI);

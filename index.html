@@ -28,7 +28,7 @@
   // const  canvas = document.getElementById('canvas');
   import CanvasPoster from "./lib/index.ts";
   const poster = new CanvasPoster(canvas, {
-    width: 375,
+    width: window.innerWidth,
     height: 3615,
     type: "2d",
     ratio: window.innerWidth / 750,
@@ -59,7 +59,7 @@
     {
       type: 'text',
       source: '哈哈哈哈哈哈哈哈哈哈哈',
-      x: Math.floor(375 / 2),
+      x: Math.floor(320 / 2),
       y: 12,
       maxWidth: 375,
       color: '#f0f0ff'
