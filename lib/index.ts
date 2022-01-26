@@ -5,20 +5,21 @@
  * @author Mr.Hou
  * @time 2021/11/18
  */
-import { PosterConfig, TextConfig, ImageConfig, DrawProps } from "./type";
-type Selector = string
+import { DrawProps, PosterConfig, TargetType } from "./type";
 class CanvasPoster {
   private _canvas: HTMLCanvasElement;
   private _ctx: CanvasRenderingContext2D;
   private _config: PosterConfig;
-  public _ratio = 1;
-  private _openEvent =false
+  public _ratio: number = 1;
+  private _eventTarget: TargetType;
   constructor(canvas: HTMLCanvasElement, config?: PosterConfig) {
     this._canvas = canvas;
     this._config = config;
     this._ctx = this._canvas.getContext("2d", { alpha: false });
-    this._ratio =config.ratio
-    config.onClick&&this.listener(config.onClick)
+    this._ratio = config.ratio
+    this._eventTarget = Object.create({});
+    config.onClick && this._listener(config.onClick)
+    config.target && this._addTargets(config.target)
     // 设置canvas
     this._setCanvas();
   }
@@ -30,7 +31,7 @@ class CanvasPoster {
     let devicePixelRatio = window.devicePixelRatio || 1;
     if (this._config) {
       this._canvas.width = this._config.width * devicePixelRatio;
-      this._canvas.height = this._config.height * devicePixelRatio*this._ratio;
+      this._canvas.height = this._config.height * devicePixelRatio * this._ratio;
       this._ctx.scale(devicePixelRatio, devicePixelRatio);
     }
     this._ctx.font = "24px sans-serif";
@@ -40,6 +41,63 @@ class CanvasPoster {
   }
 
   /**
+   * @description 将自定义目标位置加入目标列表
+   * @param {Array[TargetType]} targets
+   * @returns
+   */
+  private _addTargets(targets: any) {
+    if (!targets || Object.keys(targets).length <= 0) return
+    for (let i in targets) {
+      let target = {
+        x: targets[i].x * this._ratio,
+        y: targets[i].y * this._ratio, 
+        width: targets[i].width * this._ratio, // 宽度宽度
+        height: targets[i].height * this._ratio, // 目标区域高
+        left: (targets[i].x + targets[i].width) * this._ratio, // 右边距上距离
+        top: (targets[i].y + targets[i].height) * this._ratio, // 底部距上距离
+      };
+      this._eventTarget[i] = target;
+    }
+  }
+
+  /**
+   * @description 判断点击位置是否在目标区域内
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean, string} boolean: 点击在目标区域内，string: 点击的目标名称
+   */
+  private _isInTargets(x: number, y: number) {
+    let isIn = false;
+    let t = null;
+    for (let i in this._eventTarget) {
+      let target = this._eventTarget[i];
+      if (x >= target.x && x <= target.left && y >= target.y && y <= target.top) {
+        isIn = true;
+        t = i;
+        break;
+      }
+    }
+    return { isIn, t };
+  }
+
+  /**
+   * @description 监听点击事件
+   * @param {Function} callback
+   * @returns
+   */
+  private _listener(callback: Function) {
+    this._canvas.addEventListener("click", (event) => {
+      let $target = this._isInTargets(event.offsetX, event.offsetY);
+      let position = {
+        x: event.offsetX,
+        y: event.offsetY
+      }
+      event['$position'] = position;
+      event['$target'] = $target;
+      callback(event);
+    });
+  }
+  /**
    * @description 绘制
    * @param {Array[ImageConfig|TextConfig]} data
    * @returns
@@ -47,17 +105,16 @@ class CanvasPoster {
   public async draw(data: Array<DrawProps>) {
     let len = data.length;
     for (let i = 0; i < len; i++) {
+      // this.addEvent(data[i].events);
       if (data[i].type === "text") {
         this.drawText(data[i]);
-        // continue
+        continue
       }
       if (data[i].type === "image") {
-        // if (data[i].image instanceof Image) {
-        //   this.drawImage(data[i]);
-        //   console.log(i);
-
-        //   // continue
-        // }
+        if (data[i].source instanceof Image) {
+          this.drawImage(data[i]);
+          continue;
+        }
         if (typeof data[i].type === "string") {
           let img = await this.createImage(data[i].source as string);
           // console.log(img);
@@ -65,8 +122,6 @@ class CanvasPoster {
           this.drawImage(data[i]);
         }
       }
-      console.log(data[i]);
-      
     }
   }
 
@@ -77,7 +132,7 @@ class CanvasPoster {
    * @returns
    */
   public async drawText(params: DrawProps): Promise<number> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (params.font) {
         this._ctx.font = params.font;
       }
@@ -86,7 +141,7 @@ class CanvasPoster {
       }
       if (params.textAlign) {
         console.log(params.textAlign);
-        
+
         this._ctx.textAlign = params.textAlign;
       }
       if (!params.maxWidth) {
@@ -134,7 +189,7 @@ class CanvasPoster {
    * @returns
    */
   public async drawImage(params: DrawProps): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(() => {
       if (params.borderRadius !== undefined) {
         this.creatBorderRect(
           params.x,
@@ -154,13 +209,13 @@ class CanvasPoster {
         params.dHeight == undefined
       ) {
         // console.log(params);
-        
+
         this._ctx.drawImage(
           params.source as CanvasImageSource,
-          params.x*this._ratio,
-          params.y*this._ratio,
-          params.width*this._ratio,
-          params.height*this._ratio,
+          params.x * this._ratio,
+          params.y * this._ratio,
+          params.width * this._ratio,
+          params.height * this._ratio,
         );
       } else {
         this._ctx.drawImage(
@@ -261,7 +316,7 @@ class CanvasPoster {
    * @param quality 图片质量(0-1)
    * @returns String
    */
-  public canvas2Image(type: string, quality: number) {
+  public canvas2Image() {
     let canvasImg = this._canvas.toDataURL("image/png", 1);
     return canvasImg;
   }
@@ -280,18 +335,9 @@ class CanvasPoster {
   public getCtx(): RenderingContext {
     return this._ctx;
   }
-  public setRatio(resW: number, deviceW: number) {
-      this._ratio = deviceW / resW;
-  }
-  public listener(callback: Function) {
-    this._canvas.addEventListener("click", (event)=>{
-      let position = {
-        x: event.offsetX,
-        y: event.offsetY
-      }
-      event['$position'] = position;
-      callback(event);
-    });
-  }
+
+  /* public setRatio(resW: number, deviceW: number) {
+    this._ratio = deviceW / resW;
+  } */
 }
 export default CanvasPoster;

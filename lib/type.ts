@@ -5,7 +5,7 @@ export interface PosterConfig {
     height: number;
     type: string;
     ratio:number;
-    openEvent?: boolean;
+    target:TargetType;
     onClick?: (e: MouseEvent) => void;
 }
 export interface TextConfig {
@@ -19,7 +19,6 @@ export interface TextConfig {
     lineHeight?: number;
     totalLine?: number;
     maxWidth?: number;
-    events?:[string, Function][];
 }
 export interface ImageConfig {
     type: string;
@@ -33,9 +32,17 @@ export interface ImageConfig {
     dWidth: number | undefined;
     dHeight: number | undefined;
     borderRadius: number | undefined;
-    events?:[string, Function][];
 }
-
+export interface TargetType{
+    [key:string]:{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        left?: number;
+        top?: number;
+    }
+}
 export type SourceType = 'image' | 'text';
 export type DrawProps= {
     type: SourceType;
@@ -55,5 +62,4 @@ export type DrawProps= {
     totalLine?: number;
     lineHeight?: number;
     textAlign?: CanvasTextAlign;
-    events?:[string, Function][];
 }

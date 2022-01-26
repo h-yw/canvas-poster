@@ -32,9 +32,19 @@
     height: 3615,
     type: "2d",
     ratio: window.innerWidth / 750,
+    target: {
+      share: {
+        x: 644,
+        y: 58,
+        width: 96,
+        height: 96,
+      }
+    },
     onClick: (e) => {
-      console.log(e.$position)
-      console.log(e);
+      // 点击位置
+      console.log(e.$position);
+      // 击中目标
+      console.log(e.$target);
     }
   });
   poster.draw([
@@ -45,18 +55,12 @@
       y: 0,
       width: 750,
       height: 3615,
-      events: {
-        share: function (e) {
-          console.log(e);
-        }
-      }
     },
     {
       type: 'text',
       source: '哈哈哈哈哈哈哈哈哈哈哈',
       x: Math.floor(375 / 2),
       y: 12,
-      // textAlign: 'center',
       maxWidth: 375,
       color: '#f0f0ff'
     }
